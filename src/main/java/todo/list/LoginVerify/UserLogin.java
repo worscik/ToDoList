@@ -1,9 +1,14 @@
 package todo.list.LoginVerify;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserLogin {
 
     private String email;
     private String password;
+
+    UserToken userToken;
 
     public UserLogin(String email, String password) {
         this.email = email;
@@ -25,4 +30,6 @@ public class UserLogin {
     public void setPassword(String password) {
         this.password = password;
     }
+
+
 }
