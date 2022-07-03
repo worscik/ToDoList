@@ -15,11 +15,7 @@ public class UserToken {
         return token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String generateNewToken() {
+    public String setToken() {
         byte[] randomBytes = new byte[24];
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
