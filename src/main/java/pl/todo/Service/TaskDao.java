@@ -1,6 +1,7 @@
 package pl.todo.Service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import pl.todo.Model.Task;
@@ -8,16 +9,18 @@ import pl.todo.Model.Task;
 import java.util.List;
 
 @Repository
-public class ToDoRepository {
+public class TaskDao {
 
     private final EntityManager entityManager;
 
-    public ToDoRepository(EntityManager entityManager) {
+    public TaskDao(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     public Task getTask(int id) {
-        return entityManager.find(Task.class, id);
+        Query result = entityManager.createNativeQuery("SELECT * FROM TASK WHERE ID = :id")
+                .setParameter("id",id);
+        return (Task) result;
     }
 
     public List<Task> getTasks() {
@@ -33,6 +36,11 @@ public class ToDoRepository {
 
     @Transactional
     public Task updateTask(Task task){
-        return null;
+        return entityManager.merge(task);
+    }
+
+    @Transactional
+    public Task findTask(int id){
+        return entityManager.find(Task.class, id);
     }
 }

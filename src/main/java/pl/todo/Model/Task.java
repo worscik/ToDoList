@@ -1,5 +1,6 @@
 package pl.todo.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +21,8 @@ public class Task {
     private Instant startTaskTime;
     private Instant endTaskTime;
     private Instant createdOn;
+    private Instant modifyOn;
+    private int version;
 
     private Task() {
     }
@@ -31,6 +34,8 @@ public class Task {
         this.startTaskTime = builder.startTaskTime;
         this.endTaskTime = builder.endTaskTime;
         this.createdOn = builder.createdOn;
+        this.modifyOn = builder.modifyOn;
+        this.version = builder.version;
     }
 
     public long getId() {
@@ -61,6 +66,50 @@ public class Task {
         return createdOn;
     }
 
+    public Instant getModifyOn() {
+        return modifyOn;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStartTaskTime(Instant startTaskTime) {
+        this.startTaskTime = startTaskTime;
+    }
+
+    public void setEndTaskTime(Instant endTaskTime) {
+        this.endTaskTime = endTaskTime;
+    }
+
+    public void setCreatedOn(Instant createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public void setModifyOn(Instant modifyOn) {
+        this.modifyOn = modifyOn;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     public static class Builder {
         private UUID uuid;
         private String name;
@@ -68,7 +117,8 @@ public class Task {
         private Instant startTaskTime;
         private Instant endTaskTime;
         private Instant createdOn;
-
+        private Instant modifyOn;
+        private int version;
 
         public Builder uuid(UUID uuid) {
             this.uuid = uuid;
@@ -97,6 +147,16 @@ public class Task {
 
         public Builder createdOn(Instant createdOn) {
             this.createdOn = createdOn;
+            return this;
+        }
+
+        public Builder setModifyOn(Instant modifyOn) {
+            this.modifyOn = modifyOn;
+            return this;
+        }
+
+        public Builder setVersion(int version) {
+            this.version = version;
             return this;
         }
 
