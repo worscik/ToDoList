@@ -1,6 +1,5 @@
 package pl.todo.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +14,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private UUID uuid;
+    private UUID externalId;
     private String name;
     private String description;
     private Instant startTaskTime;
@@ -28,7 +27,7 @@ public class Task {
     }
 
     private Task(Builder builder) {
-        this.uuid = builder.uuid;
+        this.externalId = builder.uuid;
         this.name = builder.name;
         this.description = builder.description;
         this.startTaskTime = builder.startTaskTime;
@@ -42,8 +41,8 @@ public class Task {
         return id;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public String getName() {
@@ -78,8 +77,8 @@ public class Task {
         this.id = id;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setExternalId(UUID externalId) {
+        this.externalId = externalId;
     }
 
     public void setName(String name) {
@@ -169,7 +168,7 @@ public class Task {
     public String toString() {
         return "Task{" +
                 "id=" + id +
-                ", uuid=" + uuid +
+                ", uuid=" + externalId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", startTaskTime=" + startTaskTime +

@@ -2,6 +2,7 @@ package pl.todo.Service;
 
 import pl.todo.Model.Task;
 import pl.todo.Model.TaskRequest;
+import pl.todo.Model.TaskResponse;
 import pl.todo.Model.UpdateTaskRequest;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface TaskService {
 
     Task removeTask(int id);
 
-    Task updateTask(UpdateTaskRequest updateTaskRequest);
+    TaskResponse updateTask(UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse);
 
     boolean validate(TaskRequest taskRequest);
 

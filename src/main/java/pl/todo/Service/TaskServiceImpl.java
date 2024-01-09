@@ -3,10 +3,12 @@ package pl.todo.Service;
 import org.springframework.stereotype.Service;
 import pl.todo.Model.Task;
 import pl.todo.Model.TaskRequest;
+import pl.todo.Model.TaskResponse;
 import pl.todo.Model.UpdateTaskRequest;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -54,15 +56,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTask(UpdateTaskRequest updateTaskRequest) {
-        Task task = taskDao.findTask(updateTaskRequest.getId());
+    public TaskResponse updateTask(UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse) {
+        Task task = taskDao.findTask(updateTaskRequest.getExternalId());
+        if(Objects.isNull(task)){
+            return new TaskResponse(task,"Not found");
+        }
         task.setName(updateTaskRequest.getName());
         task.setVersion(task.getVersion() + NEW_VERSION);
         task.setModifyOn(Instant.now());
         task.setDescription(updateTaskRequest.getDescription());
         taskDao.updateTask(task);
         System.out.println("Updated task: " + task);
-        return task;
+        return new TaskResponse(task,"");
     }
 
     @Override
@@ -72,7 +77,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean validate(UpdateTaskRequest updateTaskRequest) {
-        return false;
+        return validateNamespace(updateTaskRequest.getName());
     }
 
 

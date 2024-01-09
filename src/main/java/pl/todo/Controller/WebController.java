@@ -3,10 +3,12 @@ package pl.todo.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.todo.Model.Task;
 import pl.todo.Model.TaskRequest;
+import pl.todo.Model.TaskResponse;
 import pl.todo.Model.UpdateTaskRequest;
 import pl.todo.Service.TaskServiceImpl;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/task")
@@ -42,10 +44,11 @@ public class WebController {
     }
 
     @PostMapping("/update")
-    public Task updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+    public TaskResponse updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+        TaskResponse taskResponse = new TaskResponse();
         if(!taskService.validate(updateTaskRequest)){
             return null;
         }
-        return taskService.updateTask(updateTaskRequest);
+        return taskService.updateTask(updateTaskRequest, taskResponse);
     }
 }

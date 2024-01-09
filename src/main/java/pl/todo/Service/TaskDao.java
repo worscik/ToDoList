@@ -1,12 +1,14 @@
 package pl.todo.Service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import pl.todo.Model.Task;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class TaskDao {
@@ -40,7 +42,12 @@ public class TaskDao {
     }
 
     @Transactional
-    public Task findTask(int id){
-        return entityManager.find(Task.class, id);
+    public Task findTask(UUID externalId){
+        try{
+            return (Task) entityManager.createNativeQuery("SELECT * FROM TASK WHERE EXTERNAL_ID = :extId", Task.class)
+                    .setParameter("extId",externalId)
+                    .getSingleResult();
+        } catch (NoResultException e){}
+        return null;
     }
 }
