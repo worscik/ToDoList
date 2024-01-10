@@ -1,15 +1,10 @@
 package pl.todo.Service;
 
 import org.springframework.stereotype.Service;
-import pl.todo.Model.Task;
-import pl.todo.Model.TaskRequest;
-import pl.todo.Model.TaskResponse;
-import pl.todo.Model.UpdateTaskRequest;
+import pl.todo.Model.*;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -29,12 +24,16 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTasks() {
-        return taskDao.getTasks();
+    public TaskListResponse getTasks(TaskListResponse response) {
+        List<Task> listTasks = taskDao.getTasks();
+        if (listTasks.isEmpty()) {
+            return new TaskListResponse(Collections.emptyList(), "Not found tasks");
+        }
+        return new TaskListResponse(listTasks);
     }
 
     @Override
-    public Task insertTask(TaskRequest taskRequest) {
+    public TaskResponse insertTask(TaskRequest taskRequest, TaskResponse taskResponse) {
         Task task = new Task.Builder()
                 .uuid(UUID.randomUUID())
                 .name(taskRequest.getName())
@@ -45,9 +44,14 @@ public class TaskServiceImpl implements TaskService {
                 .setVersion(0)
                 .setModifyOn(null)
                 .build();
-        taskDao.addTask(task);
-        System.out.println("Added task: " + task);
-        return task;
+        try {
+            taskDao.addTask(task);
+            System.out.println("Added task: " + task);
+            return new TaskResponse(task);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new TaskResponse(task, "Error.");
+        }
     }
 
     @Override
@@ -56,18 +60,25 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse updateTask(UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse) {
-        Task task = taskDao.findTask(updateTaskRequest.getExternalId());
-        if(Objects.isNull(task)){
-            return new TaskResponse(task,"Not found");
+    public TaskResponse updateTask(UpdateTaskRequest request, TaskResponse taskResponse) {
+        Task task = taskDao.findTask(request.getExternalId());
+        if (Objects.isNull(task)) {
+            return new TaskResponse(task, "Not found");
         }
-        task.setName(updateTaskRequest.getName());
+        task.setName(request.getName());
         task.setVersion(task.getVersion() + NEW_VERSION);
         task.setModifyOn(Instant.now());
-        task.setDescription(updateTaskRequest.getDescription());
-        taskDao.updateTask(task);
-        System.out.println("Updated task: " + task);
-        return new TaskResponse(task,"");
+        task.setDescription(request.getDescription());
+        task.setStartTaskTime(resolveTime(request.getStartTaskTime(), task.getStartTaskTime()));
+        task.setEndTaskTime(resolveTime(request.getEndTaskTime(), task.getEndTaskTime()));
+        try {
+            taskDao.updateTask(task);
+            System.out.println("Updated task: " + task);
+            return new TaskResponse(task);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new TaskResponse(task, "Error.");
+        }
     }
 
     @Override
@@ -89,5 +100,12 @@ public class TaskServiceImpl implements TaskService {
             return false;
         }
         return true;
+    }
+
+    private Instant resolveTime(Instant oldTime, Instant newTime) {
+        if (oldTime != newTime) {
+            return newTime;
+        }
+        return oldTime;
     }
 }

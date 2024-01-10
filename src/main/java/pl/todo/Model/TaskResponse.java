@@ -8,8 +8,17 @@ public class TaskResponse {
     public TaskResponse() {
     }
 
+    public TaskResponse(Task task) {
+        this.task = task;
+
+    }
+
     public TaskResponse(Task task, String errorMsg) {
         this.task = task;
+        this.errorMsg = errorMsg;
+    }
+
+    public TaskResponse(String errorMsg) {
         this.errorMsg = errorMsg;
     }
 

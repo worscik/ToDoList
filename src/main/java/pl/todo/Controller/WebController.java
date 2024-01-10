@@ -1,17 +1,18 @@
 package pl.todo.Controller;
 
+import jakarta.persistence.EntityManager;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.todo.Model.Task;
-import pl.todo.Model.TaskRequest;
-import pl.todo.Model.TaskResponse;
-import pl.todo.Model.UpdateTaskRequest;
+import pl.todo.Model.*;
 import pl.todo.Service.TaskServiceImpl;
 
+import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/task")
+@RequestMapping("/api")
 public class WebController {
 
     private final TaskServiceImpl taskService;
@@ -31,24 +32,27 @@ public class WebController {
     }
 
     @GetMapping("/getTasks")
-    public List<Task> getTasks() {
-        return taskService.getTasks();
+    public ResponseEntity<TaskListResponse> getTasks() {
+        TaskListResponse response = new TaskListResponse();
+        return new ResponseEntity<>(taskService.getTasks(response),HttpStatus.OK);
     }
 
     @PostMapping("/insert")
-    public Task addTask(@RequestBody TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
+        TaskResponse taskResponse = new TaskResponse();
         if(!taskService.validate(taskRequest)){
-            return null;
+            return new ResponseEntity("Request is not correct", HttpStatus.BAD_REQUEST);
         }
-        return taskService.insertTask(taskRequest);
+        return new ResponseEntity(taskService.insertTask(taskRequest, taskResponse), HttpStatus.OK);
     }
 
     @PostMapping("/update")
-    public TaskResponse updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
         TaskResponse taskResponse = new TaskResponse();
         if(!taskService.validate(updateTaskRequest)){
-            return null;
+            return new ResponseEntity("Request is not correct", HttpStatus.BAD_REQUEST);
         }
-        return taskService.updateTask(updateTaskRequest, taskResponse);
+
+        return new ResponseEntity(taskService.updateTask(updateTaskRequest, taskResponse), HttpStatus.OK);
     }
 }

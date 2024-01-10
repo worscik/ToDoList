@@ -1,9 +1,6 @@
 package pl.todo.Service;
 
-import pl.todo.Model.Task;
-import pl.todo.Model.TaskRequest;
-import pl.todo.Model.TaskResponse;
-import pl.todo.Model.UpdateTaskRequest;
+import pl.todo.Model.*;
 
 import java.util.List;
 
@@ -11,9 +8,9 @@ public interface TaskService {
 
     Task getTask(int id);
 
-    List<Task> getTasks();
+    TaskListResponse getTasks(TaskListResponse response);
 
-    Task insertTask(TaskRequest taskRequest);
+    TaskResponse insertTask(TaskRequest taskRequest, TaskResponse taskResponse);
 
     Task removeTask(int id);
 
