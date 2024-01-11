@@ -4,13 +4,15 @@ import org.springframework.stereotype.Service;
 import pl.todo.Model.*;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class TaskServiceImpl implements TaskService {
 
     public final static int NEW_VERSION = 1;
-
     private final TaskDao taskDao;
 
     public TaskServiceImpl(TaskDao taskDao) {
@@ -83,23 +85,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean validate(TaskRequest taskRequest) {
-        return validateNamespace(taskRequest.getName());
+        return validateRequest(taskRequest.getName(), taskRequest.getDescription());
     }
 
     @Override
     public boolean validate(UpdateTaskRequest updateTaskRequest) {
-        return validateNamespace(updateTaskRequest.getName());
-    }
-
-
-    private boolean validateNamespace(String name) {
-        if (name.equals("") || name.isEmpty()) {
-            return false;
-        }
-        if (name.length() > 255) {
-            return false;
-        }
-        return true;
+        return validateRequest(updateTaskRequest.getName(), updateTaskRequest.getDescription());
     }
 
     private Instant resolveTime(Instant oldTime, Instant newTime) {
@@ -108,4 +99,18 @@ public class TaskServiceImpl implements TaskService {
         }
         return oldTime;
     }
+
+    public boolean validateRequest(String name, String description) {
+        if (name.equals("") || name.isBlank() || name.length() > 128) {
+            return false;
+        }
+        if (description.equals("") || description.isEmpty() || description.length() > 1028) {
+            return false;
+        }
+        return true;
+    }
+
+
 }
+
+

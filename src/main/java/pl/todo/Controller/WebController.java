@@ -50,9 +50,11 @@ public class WebController {
     public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
         TaskResponse taskResponse = new TaskResponse();
         if(!taskService.validate(updateTaskRequest)){
+            if(updateTaskRequest.getExternalId().equals("")){
+                return new ResponseEntity("ExternalId can not be empty.", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity("Request is not correct", HttpStatus.BAD_REQUEST);
         }
-
         return new ResponseEntity(taskService.updateTask(updateTaskRequest, taskResponse), HttpStatus.OK);
     }
 }
