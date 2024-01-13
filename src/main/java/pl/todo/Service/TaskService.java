@@ -2,11 +2,9 @@ package pl.todo.Service;
 
 import pl.todo.Model.*;
 
-import java.util.List;
-
 public interface TaskService {
 
-    Task getTask(int id);
+    TaskResponse getTask(int id);
 
     TaskListResponse getTasks(TaskListResponse response);
 

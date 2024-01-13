@@ -1,14 +1,14 @@
 package pl.todo.Controller;
 
-import jakarta.persistence.EntityManager;
-import org.springframework.http.HttpStatus;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.todo.Model.*;
+import pl.todo.Model.TaskListResponse;
+import pl.todo.Model.TaskRequest;
+import pl.todo.Model.TaskResponse;
+import pl.todo.Model.UpdateTaskRequest;
 import pl.todo.Service.TaskServiceImpl;
 
-import java.net.http.HttpRequest;
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -27,34 +27,42 @@ public class WebController {
     }
 
     @GetMapping("/getTaskById")
-    public Task getTaskById(@RequestParam int id) {
-        return taskService.getTask(id);
+    public ResponseEntity<TaskResponse> getTaskById(@RequestParam int id) {
+        TaskResponse task = taskService.getTask(id);
+
+        if (Objects.isNull(task)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(task);
     }
 
     @GetMapping("/getTasks")
     public ResponseEntity<TaskListResponse> getTasks() {
         TaskListResponse response = new TaskListResponse();
-        return new ResponseEntity<>(taskService.getTasks(response),HttpStatus.OK);
+        TaskListResponse result = taskService.getTasks(response);
+
+        if (result.getTasks().isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/insert")
     public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
         TaskResponse taskResponse = new TaskResponse();
-        if(!taskService.validate(taskRequest)){
-            return new ResponseEntity("Request is not correct", HttpStatus.BAD_REQUEST);
+        if (!taskService.validate(taskRequest)) {
+            return ResponseEntity.badRequest().body(taskResponse);
         }
-        return new ResponseEntity(taskService.insertTask(taskRequest, taskResponse), HttpStatus.OK);
+        return ResponseEntity.ok(taskService.insertTask(taskRequest, taskResponse));
     }
 
     @PostMapping("/update")
     public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
         TaskResponse taskResponse = new TaskResponse();
-        if(!taskService.validate(updateTaskRequest)){
-            if(updateTaskRequest.getExternalId().equals("")){
-                return new ResponseEntity("ExternalId can not be empty.", HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity("Request is not correct", HttpStatus.BAD_REQUEST);
+        if (!taskService.validate(updateTaskRequest) ||
+                StringUtils.isBlank(String.valueOf(updateTaskRequest.getExternalId()))) {
+            return ResponseEntity.badRequest().body(taskResponse);
         }
-        return new ResponseEntity(taskService.updateTask(updateTaskRequest, taskResponse), HttpStatus.OK);
+        return ResponseEntity.ok(taskService.updateTask(updateTaskRequest, taskResponse));
     }
 }

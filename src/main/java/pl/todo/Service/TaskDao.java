@@ -20,9 +20,7 @@ public class TaskDao {
     }
 
     public Task getTask(int id) {
-        Query result = entityManager.createNativeQuery("SELECT * FROM TASK WHERE ID = :id")
-                .setParameter("id",id);
-        return (Task) result;
+        return entityManager.find(Task.class, id);
     }
 
     public List<Task> getTasks() {

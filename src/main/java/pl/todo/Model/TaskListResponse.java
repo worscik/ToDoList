@@ -4,27 +4,27 @@ import java.util.List;
 
 public class TaskListResponse {
 
-    private List<Task> task;
+    private List<Task> tasks;
     private String errorMsg;
 
-    public TaskListResponse(List<Task> task, String errorMsg) {
-        this.task = task;
+    public TaskListResponse(List<Task> tasks, String errorMsg) {
+        this.tasks = tasks;
         this.errorMsg = errorMsg;
     }
 
-    public TaskListResponse(List<Task> task) {
-        this.task = task;
+    public TaskListResponse(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     public TaskListResponse() {
     }
 
-    public List<Task> getTask() {
-        return task;
+    public List<Task> getTasks() {
+        return tasks;
     }
 
-    public void setTask(List<Task> task) {
-        this.task = task;
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     public String getErrorMsg() {
