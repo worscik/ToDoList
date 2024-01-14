@@ -26,6 +26,25 @@ public class WebController {
         return "Home page";
     }
 
+    @PostMapping("/addTask")
+    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
+        TaskResponse taskResponse = new TaskResponse();
+        if (!taskService.validate(taskRequest)) {
+            return ResponseEntity.badRequest().body(taskResponse);
+        }
+        return ResponseEntity.ok(taskService.insertTask(taskRequest, taskResponse));
+    }
+
+    @PostMapping("/updateTask")
+    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+        TaskResponse taskResponse = new TaskResponse();
+        if (!taskService.validate(updateTaskRequest) ||
+                StringUtils.isBlank(String.valueOf(updateTaskRequest.getExternalId()))) {
+            return ResponseEntity.badRequest().body(taskResponse);
+        }
+        return ResponseEntity.ok(taskService.updateTask(updateTaskRequest, taskResponse));
+    }
+
     @GetMapping("/getTaskById")
     public ResponseEntity<TaskResponse> getTaskById(@RequestParam int id) {
         TaskResponse task = taskService.getTask(id);
@@ -47,22 +66,8 @@ public class WebController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/insert")
-    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
-        TaskResponse taskResponse = new TaskResponse();
-        if (!taskService.validate(taskRequest)) {
-            return ResponseEntity.badRequest().body(taskResponse);
-        }
-        return ResponseEntity.ok(taskService.insertTask(taskRequest, taskResponse));
-    }
-
-    @PostMapping("/update")
-    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
-        TaskResponse taskResponse = new TaskResponse();
-        if (!taskService.validate(updateTaskRequest) ||
-                StringUtils.isBlank(String.valueOf(updateTaskRequest.getExternalId()))) {
-            return ResponseEntity.badRequest().body(taskResponse);
-        }
-        return ResponseEntity.ok(taskService.updateTask(updateTaskRequest, taskResponse));
+    @DeleteMapping("/deleteTaskById")
+    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id){
+        return null;
     }
 }

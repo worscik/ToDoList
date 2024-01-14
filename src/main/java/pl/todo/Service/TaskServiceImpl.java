@@ -123,7 +123,7 @@ public class TaskServiceImpl implements TaskService {
                 .uuid(UUID.randomUUID())
                 .name(taskRequest.getName())
                 .description(taskRequest.getDescription())
-                .startTaskTime(taskRequest.getStartTaskTime())
+                .startTaskTime(Instant.now())
                 .endTaskTime(taskRequest.getEndTaskTime())
                 .createdOn(Instant.now())
                 .setVersion(0)
