@@ -9,6 +9,7 @@ import pl.todo.Model.TaskResponse;
 import pl.todo.Model.UpdateTaskRequest;
 import pl.todo.Service.TaskServiceImpl;
 
+import java.security.Principal;
 import java.util.Objects;
 
 @RestController
@@ -27,7 +28,8 @@ public class WebController {
     }
 
     @PostMapping("/addTask")
-    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest,
+                                                Principal principal) {
         TaskResponse taskResponse = new TaskResponse();
         if (!taskService.validate(taskRequest)) {
             return ResponseEntity.badRequest().body(taskResponse);
@@ -36,7 +38,8 @@ public class WebController {
     }
 
     @PostMapping("/updateTask")
-    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest,
+                                                   Principal principal) {
         TaskResponse taskResponse = new TaskResponse();
         if (!taskService.validate(updateTaskRequest) ||
                 StringUtils.isBlank(String.valueOf(updateTaskRequest.getExternalId()))) {
@@ -46,7 +49,7 @@ public class WebController {
     }
 
     @GetMapping("/getTaskById")
-    public ResponseEntity<TaskResponse> getTaskById(@RequestParam int id) {
+    public ResponseEntity<TaskResponse> getTaskById(@RequestParam int id, Principal principal) {
         TaskResponse task = taskService.getTask(id);
 
         if (Objects.isNull(task)) {
@@ -56,7 +59,7 @@ public class WebController {
     }
 
     @GetMapping("/getTasks")
-    public ResponseEntity<TaskListResponse> getTasks() {
+    public ResponseEntity<TaskListResponse> getTasks(Principal principal) {
         TaskListResponse response = new TaskListResponse();
         TaskListResponse result = taskService.getTasks(response);
 
@@ -67,7 +70,7 @@ public class WebController {
     }
 
     @DeleteMapping("/deleteTaskById")
-    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id){
+    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id, Principal principal){
         return null;
     }
 }
