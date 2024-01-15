@@ -9,6 +9,7 @@ import pl.todo.Model.TaskResponse;
 import pl.todo.Model.UpdateTaskRequest;
 import pl.todo.Service.TaskServiceImpl;
 
+import java.security.Principal;
 import java.util.Objects;
 
 @RestController
@@ -27,7 +28,8 @@ public class WebController {
     }
 
     @PostMapping("/addTask")
-    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest,
+                                                Principal principal) {
         TaskResponse taskResponse = new TaskResponse();
         if (!taskService.validate(taskRequest)) {
             return ResponseEntity.badRequest().body(taskResponse);
