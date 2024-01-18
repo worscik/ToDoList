@@ -23,7 +23,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse getTask(int id) {
         Task task = taskDao.getTask(id);
-        if (Objects.isNull(task)) {
+        if (Objects.isNull(task)) {// TODO USER
+            log.info("Task with id {} not found", id);
             return new TaskResponse(NOT_FOUND_TASK);
         }
         return new TaskResponse(task);
@@ -33,6 +34,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskListResponse getTasks(TaskListResponse response) {
         List<Task> listTasks = taskDao.getTasks();
         if (listTasks.isEmpty()) {
+            log.info("Tasks not found"); // TODO USER
             return new TaskListResponse(Collections.emptyList(), NOT_FOUND_TASK);
         }
         return new TaskListResponse(listTasks);
@@ -43,6 +45,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = buildTask(taskRequest);
         Optional<Task> isExist = Optional.ofNullable(taskDao.findTask(task.getExternalId()));
         if (isExist.isPresent()) {
+            log.info("Task {0} not found", isExist.get().getId());
             return new TaskResponse(task, NOT_FOUND_TASK);
         }
         try {
@@ -71,23 +74,26 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private TaskResponse updateTaskInternal(UpdateTaskRequest request) {
-
         Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(request.getExternalId()));
+        try {
+            if (optionalTask.isPresent()) {
+                Task task = optionalTask.get();
+                task.setName(request.getName());
+                task.setVersion(task.getVersion() + NEW_VERSION);
+                task.setModifyOn(Instant.now());
+                task.setDescription(request.getDescription());
+                task.setStartTaskTime(resolveTime(request.getStartTaskTime(), task.getStartTaskTime()));
+                task.setEndTaskTime(resolveTime(request.getEndTaskTime(), task.getEndTaskTime()));
 
-        if (optionalTask.isPresent()) {
-            Task task = optionalTask.get();
-            task.setName(request.getName());
-            task.setVersion(task.getVersion() + NEW_VERSION);
-            task.setModifyOn(Instant.now());
-            task.setDescription(request.getDescription());
-            task.setStartTaskTime(resolveTime(request.getStartTaskTime(), task.getStartTaskTime()));
-            task.setEndTaskTime(resolveTime(request.getEndTaskTime(), task.getEndTaskTime()));
-
-            taskDao.updateTask(task);
-            log.info("Updated task: {}", task);
-            return new TaskResponse(task);
-        } else {
-            return new TaskResponse(null, "Task not found.");
+                taskDao.updateTask(task);
+                log.info("Updated task: {}", task);
+                return new TaskResponse(task);
+            } else {
+                return new TaskResponse(null, "Task not found.");
+            }
+        } catch (Exception e) {
+            log.error("Error during update task: {0}, errorCode: {1}", optionalTask.get().getId(), e);
+            return new TaskResponse(null, "Error during update task");
         }
     }
 

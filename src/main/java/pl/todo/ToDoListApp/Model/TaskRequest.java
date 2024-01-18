@@ -7,15 +7,16 @@ public class TaskRequest {
     private String description;
     private Instant startTaskTime;
     private Instant endTaskTime;
-    private long UserId;
+    private long userId;
 
     private TaskRequest(String name, String description, Instant startTaskTime, Instant endTaskTime, long userId) {
         this.name = name;
         this.description = description;
         this.startTaskTime = startTaskTime;
         this.endTaskTime = endTaskTime;
-        this.UserId = UserId;
+        this.userId = userId;
     }
+
 
     public static TaskRequest create(String name,
                                      String description,
@@ -58,10 +59,10 @@ public class TaskRequest {
     }
 
     public long getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(long userId) {
-        UserId = userId;
+        this.userId = userId;
     }
 }

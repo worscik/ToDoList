@@ -1,6 +1,8 @@
 package pl.todo.ToDoListApp.Controller;
 
 import io.micrometer.common.util.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.todo.ToDoListApp.Model.TaskListResponse;
@@ -21,6 +23,8 @@ public class WebController {
 
     private final TaskServiceImpl taskService;
     private final UserServiceImpl userService;
+    private static Logger logger = LogManager.getLogger(WebController.class);
+
 
     public WebController(TaskServiceImpl taskService, UserServiceImpl userService) {
         this.taskService = taskService;
@@ -42,6 +46,7 @@ public class WebController {
                 .build();
         Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
         if (!result.isPresent()) {
+            logger.info("UserService response: user with id {} not found in database", user.getId());
             return ResponseEntity.notFound().build();
         }
         TaskResponse taskResponse = new TaskResponse();
