@@ -1,6 +1,6 @@
-package pl.todo.Service;
+package pl.todo.ToDoListApp.Service;
 
-import pl.todo.Model.*;
+import pl.todo.ToDoListApp.Model.*;
 
 public interface TaskService {
 

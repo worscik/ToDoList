@@ -1,9 +1,9 @@
-package pl.todo.Service;
+package pl.todo.ToDoListApp.Service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import pl.todo.Model.*;
+import pl.todo.ToDoListApp.Model.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -23,7 +23,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse getTask(int id) {
         Task task = taskDao.getTask(id);
-        if(Objects.isNull(task)){
+        if (Objects.isNull(task)) {
             return new TaskResponse(NOT_FOUND_TASK);
         }
         return new TaskResponse(task);
@@ -126,8 +126,9 @@ public class TaskServiceImpl implements TaskService {
                 .startTaskTime(Instant.now())
                 .endTaskTime(taskRequest.getEndTaskTime())
                 .createdOn(Instant.now())
-                .setVersion(0)
-                .setModifyOn(null)
+                .version(0)
+                .modifyOn(null)
+                .userId(1)
                 .build();
         return task;
     }

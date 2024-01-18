@@ -1,11 +1,10 @@
-package pl.todo.Service;
+package pl.todo.ToDoListApp.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
-import pl.todo.Model.Task;
+import pl.todo.ToDoListApp.Model.Task;
 
 import java.util.List;
 import java.util.UUID;

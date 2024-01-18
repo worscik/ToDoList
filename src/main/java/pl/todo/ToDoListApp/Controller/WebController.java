@@ -1,26 +1,32 @@
-package pl.todo.Controller;
+package pl.todo.ToDoListApp.Controller;
 
 import io.micrometer.common.util.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.todo.Model.TaskListResponse;
-import pl.todo.Model.TaskRequest;
-import pl.todo.Model.TaskResponse;
-import pl.todo.Model.UpdateTaskRequest;
-import pl.todo.Service.TaskServiceImpl;
+import pl.todo.ToDoListApp.Model.TaskListResponse;
+import pl.todo.ToDoListApp.Model.TaskRequest;
+import pl.todo.ToDoListApp.Model.TaskResponse;
+import pl.todo.ToDoListApp.Model.UpdateTaskRequest;
+import pl.todo.ToDoListApp.Service.TaskServiceImpl;
+import pl.todo.User.Model.User;
+import pl.todo.User.Service.UserServiceImpl;
 
 import java.security.Principal;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class WebController {
 
     private final TaskServiceImpl taskService;
+    private final UserServiceImpl userService;
 
-    public WebController(TaskServiceImpl taskService) {
+    public WebController(TaskServiceImpl taskService, UserServiceImpl userService) {
         this.taskService = taskService;
+        this.userService = userService;
     }
+
 
     @RequestMapping("/")
     public String homePage() {
@@ -30,6 +36,14 @@ public class WebController {
     @PostMapping("/addTask")
     public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest,
                                                 Principal principal) {
+        User user = new User.Builder()
+                .withId(taskRequest.getUserId())
+                .withLogin(principal.getName())
+                .build();
+        Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
+        if (!result.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
         TaskResponse taskResponse = new TaskResponse();
         if (!taskService.validate(taskRequest)) {
             return ResponseEntity.badRequest().body(taskResponse);
@@ -70,7 +84,7 @@ public class WebController {
     }
 
     @DeleteMapping("/deleteTaskById")
-    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id, Principal principal){
+    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id, Principal principal) {
         return null;
     }
 }

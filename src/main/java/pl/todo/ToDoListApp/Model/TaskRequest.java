@@ -1,4 +1,4 @@
-package pl.todo.Model;
+package pl.todo.ToDoListApp.Model;
 
 import java.time.Instant;
 
@@ -7,19 +7,22 @@ public class TaskRequest {
     private String description;
     private Instant startTaskTime;
     private Instant endTaskTime;
+    private long UserId;
 
-    private TaskRequest(String name, String description, Instant startTaskTime, Instant endTaskTime) {
+    private TaskRequest(String name, String description, Instant startTaskTime, Instant endTaskTime, long userId) {
         this.name = name;
         this.description = description;
         this.startTaskTime = startTaskTime;
         this.endTaskTime = endTaskTime;
+        this.UserId = UserId;
     }
 
     public static TaskRequest create(String name,
                                      String description,
                                      Instant startTaskTime,
-                                     Instant endTaskTime) {
-        return new TaskRequest(name, description, startTaskTime, endTaskTime);
+                                     Instant endTaskTime,
+                                     long userId) {
+        return new TaskRequest(name, description, startTaskTime, endTaskTime, userId);
     }
 
     public String getName() {
@@ -52,5 +55,13 @@ public class TaskRequest {
 
     public void setEndTaskTime(Instant endTaskTime) {
         this.endTaskTime = endTaskTime;
+    }
+
+    public long getUserId() {
+        return UserId;
+    }
+
+    public void setUserId(long userId) {
+        UserId = userId;
     }
 }

@@ -1,22 +1,24 @@
-package pl.todo.Model;
+package pl.todo.ToDoListApp.Model;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public class UpdateTaskRequest {
+public class TaskDto {
 
     private UUID externalId;
     private String name;
     private String description;
     private Instant startTaskTime;
     private Instant endTaskTime;
+    private Instant createdOn;
 
-    public UpdateTaskRequest(UUID externalId, String name, String description, Instant startTaskTime, Instant endTaskTime) {
+    public TaskDto(UUID externalId, String name, String description, Instant startTaskTime, Instant endTaskTime, Instant createdOn) {
         this.externalId = externalId;
         this.name = name;
         this.description = description;
         this.startTaskTime = startTaskTime;
         this.endTaskTime = endTaskTime;
+        this.createdOn = createdOn;
     }
 
     public UUID getExternalId() {
@@ -58,4 +60,13 @@ public class UpdateTaskRequest {
     public void setEndTaskTime(Instant endTaskTime) {
         this.endTaskTime = endTaskTime;
     }
+
+    public Instant getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Instant createdOn) {
+        this.createdOn = createdOn;
+    }
 }
+

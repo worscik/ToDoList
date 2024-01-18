@@ -1,4 +1,4 @@
-package pl.todo.Model;
+package pl.todo.ToDoListApp.Model;
 
 import java.util.List;
 
