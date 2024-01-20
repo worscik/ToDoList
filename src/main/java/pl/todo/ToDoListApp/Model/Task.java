@@ -1,5 +1,6 @@
 package pl.todo.ToDoListApp.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +14,7 @@ public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private long id;
     private UUID externalId;
     private String name;
@@ -22,6 +24,7 @@ public class Task {
     private Instant createdOn;
     private Instant modifyOn;
     private int version;
+    @JsonIgnore
     private long userId;
 
     private Task() {

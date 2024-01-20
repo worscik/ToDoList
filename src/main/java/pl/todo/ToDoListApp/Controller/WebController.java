@@ -1,16 +1,14 @@
 package pl.todo.ToDoListApp.Controller;
 
 import io.micrometer.common.util.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.todo.ToDoListApp.Model.TaskListResponse;
-import pl.todo.ToDoListApp.Model.TaskRequest;
-import pl.todo.ToDoListApp.Model.TaskResponse;
-import pl.todo.ToDoListApp.Model.UpdateTaskRequest;
+import pl.todo.ToDoListApp.Model.*;
 import pl.todo.ToDoListApp.Service.TaskServiceImpl;
 import pl.todo.User.Model.User;
+import pl.todo.User.Model.UserIdRequest;
 import pl.todo.User.Service.UserServiceImpl;
 
 import java.security.Principal;
@@ -31,19 +29,9 @@ public class WebController {
         this.userService = userService;
     }
 
-
-    @RequestMapping("/")
-    public String homePage() {
-        return "Home page";
-    }
-
     @PostMapping("/addTask")
-    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest,
-                                                Principal principal) {
-        User user = new User.Builder()
-                .withId(taskRequest.getUserId())
-                .withLogin(principal.getName())
-                .build();
+    public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
+        User user = userService.buildUser(taskRequest.getUserId(), taskRequest.getName());
         Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
         if (!result.isPresent()) {
             logger.info("UserService response: user with id {} not found in database", user.getId());
@@ -57,8 +45,13 @@ public class WebController {
     }
 
     @PostMapping("/updateTask")
-    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest,
-                                                   Principal principal) {
+    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+        User user = new User.Builder().withId(updateTaskRequest.getUserId()).build();
+        Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
+        if (!result.isPresent()) {
+            logger.info("UserService response: user with id {} not found in database", user.getId());
+            return ResponseEntity.notFound().build();
+        }
         TaskResponse taskResponse = new TaskResponse();
         if (!taskService.validate(updateTaskRequest) ||
                 StringUtils.isBlank(String.valueOf(updateTaskRequest.getExternalId()))) {
@@ -67,9 +60,16 @@ public class WebController {
         return ResponseEntity.ok(taskService.updateTask(updateTaskRequest, taskResponse));
     }
 
-    @GetMapping("/getTaskById")
-    public ResponseEntity<TaskResponse> getTaskById(@RequestParam int id, Principal principal) {
-        TaskResponse task = taskService.getTask(id);
+    @PostMapping("/getTaskById")
+    public ResponseEntity<TaskResponse> getTaskById(@RequestBody GetTaskRequest getTaskRequest) {
+        User user = new User.Builder().withId(getTaskRequest.getUserId()).build();
+        Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
+        if (!result.isPresent()) {
+            logger.info("UserService response: user with id {} not found in database", user.getId());
+            return ResponseEntity.notFound().build();
+        }
+
+        TaskResponse task = taskService.getTask(getTaskRequest.getExternalId(), getTaskRequest.getUserId());
 
         if (Objects.isNull(task)) {
             return ResponseEntity.notFound().build();
@@ -77,10 +77,17 @@ public class WebController {
         return ResponseEntity.ok(task);
     }
 
-    @GetMapping("/getTasks")
-    public ResponseEntity<TaskListResponse> getTasks(Principal principal) {
+    @PostMapping("/getTasks")
+    public ResponseEntity<TaskListResponse> getTasks(@RequestBody UserIdRequest userIdRequest) {
+        User user = new User.Builder().withId(userIdRequest.getUserId()).build();
+        Optional<User> userResult = Optional.ofNullable(userService.resolveUser(user));
+        if (!userResult.isPresent()) {
+            logger.info("UserService response: user with id {} not found in database", user.getId());
+            return ResponseEntity.notFound().build();
+        }
+
         TaskListResponse response = new TaskListResponse();
-        TaskListResponse result = taskService.getTasks(response);
+        TaskListResponse result = taskService.getTasks(userIdRequest.getUserId(), response);
 
         if (result.getTasks().isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -88,8 +95,14 @@ public class WebController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/deleteTaskById")
-    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id, Principal principal) {
+    @DeleteMapping("/deleteTaskById") // TODO CLASS
+    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id, long userId) {
+        User user = new User.Builder().withId(userId).build();
+        Optional<User> userResult = Optional.ofNullable(userService.resolveUser(user));
+        if (!userResult.isPresent()) {
+            logger.info("UserService response: user with id {} not found in database", user.getId());
+            return ResponseEntity.notFound().build();
+        }
         return null;
     }
 }

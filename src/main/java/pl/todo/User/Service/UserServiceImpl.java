@@ -8,6 +8,8 @@ import org.springframework.web.client.RestTemplate;
 import pl.todo.ToDoListApp.Controller.WebController;
 import pl.todo.User.Model.User;
 
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -23,6 +25,21 @@ public class UserServiceImpl implements UserService {
             logger.error("Response code while download user from service: {}", response.getStatusCode());
             return null;
         }
-        return response.getBody();
+        User findedUser = new User.Builder()
+                .withId(response.getBody().getId())
+                .withLogin(response.getBody().getLogin())
+                .build();
+        return findedUser;
     }
+
+    public User buildUser(long id, String name){
+        User user = new User.Builder()
+            .withId(id)
+                .withLogin(name)
+                .build();
+        return user;
+    }
+
+
+
 }

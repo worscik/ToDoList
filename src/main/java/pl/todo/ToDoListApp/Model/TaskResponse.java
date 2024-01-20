@@ -10,7 +10,6 @@ public class TaskResponse {
 
     public TaskResponse(Task task) {
         this.task = task;
-
     }
 
     public TaskResponse(Task task, String errorMsg) {

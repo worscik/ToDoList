@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.todo.ToDoListApp.Model.*;
+import pl.todo.ToDoListApp.Repository.TaskDao;
 
 import java.time.Instant;
 import java.util.*;
@@ -21,20 +22,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse getTask(int id) {
-        Task task = taskDao.getTask(id);
+    public TaskResponse getTask(UUID externalId, long userId) {
+        Task task = taskDao.getTask(externalId, userId);
         if (Objects.isNull(task)) {// TODO USER
-            log.info("Task with id {} not found", id);
+            log.info("Task with id {} not found", externalId);
             return new TaskResponse(NOT_FOUND_TASK);
         }
         return new TaskResponse(task);
     }
 
     @Override
-    public TaskListResponse getTasks(TaskListResponse response) {
-        List<Task> listTasks = taskDao.getTasks();
+    public TaskListResponse getTasks(long userId, TaskListResponse response) {
+        List<Task> listTasks = taskDao.getTasks(userId);
         if (listTasks.isEmpty()) {
-            log.info("Tasks not found"); // TODO USER
+            log.info("Tasks not found for user {}",userId );
             return new TaskListResponse(Collections.emptyList(), NOT_FOUND_TASK);
         }
         return new TaskListResponse(listTasks);
@@ -43,7 +44,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse insertTask(TaskRequest taskRequest, TaskResponse taskResponse) {
         Task task = buildTask(taskRequest);
-        Optional<Task> isExist = Optional.ofNullable(taskDao.findTask(task.getExternalId()));
+        Optional<Task> isExist = Optional.ofNullable(taskDao.findTask(task.getExternalId(),taskRequest.getUserId()));
         if (isExist.isPresent()) {
             log.info("Task {0} not found", isExist.get().getId());
             return new TaskResponse(task, NOT_FOUND_TASK);
@@ -69,12 +70,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task removeTask(int id) {
-        return null;
+    public boolean removeTask(UUID externalId, long userId) {
+        try {
+            return taskDao.deleteTask(externalId, userId);
+        } catch (Exception e) {
+            log.error("An error occurred while removing the task", e);
+            return false;
+        }
     }
 
     private TaskResponse updateTaskInternal(UpdateTaskRequest request) {
-        Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(request.getExternalId()));
+        Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(request.getExternalId(), request.getUserId()));
         try {
             if (optionalTask.isPresent()) {
                 Task task = optionalTask.get();

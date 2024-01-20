@@ -10,13 +10,20 @@ public class UpdateTaskRequest {
     private String description;
     private Instant startTaskTime;
     private Instant endTaskTime;
+    private long userId;
 
-    public UpdateTaskRequest(UUID externalId, String name, String description, Instant startTaskTime, Instant endTaskTime) {
+    public UpdateTaskRequest(UUID externalId,
+                             String name,
+                             String description,
+                             Instant startTaskTime,
+                             Instant endTaskTime,
+                             long userId) {
         this.externalId = externalId;
         this.name = name;
         this.description = description;
         this.startTaskTime = startTaskTime;
         this.endTaskTime = endTaskTime;
+        this.userId = userId;
     }
 
     public UUID getExternalId() {
@@ -57,5 +64,13 @@ public class UpdateTaskRequest {
 
     public void setEndTaskTime(Instant endTaskTime) {
         this.endTaskTime = endTaskTime;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }
