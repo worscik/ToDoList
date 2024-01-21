@@ -14,9 +14,10 @@ import pl.todo.User.Service.UserServiceImpl;
 import java.security.Principal;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/task/api")
 public class WebController {
 
     private final TaskServiceImpl taskService;
@@ -29,7 +30,7 @@ public class WebController {
         this.userService = userService;
     }
 
-    @PostMapping("/addTask")
+    @PostMapping("/add")
     public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
         User user = userService.buildUser(taskRequest.getUserId(), taskRequest.getName());
         Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
@@ -44,8 +45,9 @@ public class WebController {
         return ResponseEntity.ok(taskService.insertTask(taskRequest, taskResponse));
     }
 
-    @PostMapping("/updateTask")
-    public ResponseEntity<TaskResponse> updateTask(@RequestBody UpdateTaskRequest updateTaskRequest) {
+    @PostMapping("/update/{externalId}")
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable UUID externalId,
+                                                   @RequestBody UpdateTaskRequest updateTaskRequest) {
         User user = new User.Builder().withId(updateTaskRequest.getUserId()).build();
         Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
         if (!result.isPresent()) {
@@ -54,22 +56,23 @@ public class WebController {
         }
         TaskResponse taskResponse = new TaskResponse();
         if (!taskService.validate(updateTaskRequest) ||
-                StringUtils.isBlank(String.valueOf(updateTaskRequest.getExternalId()))) {
+                StringUtils.isBlank(String.valueOf(externalId))) {
             return ResponseEntity.badRequest().body(taskResponse);
         }
-        return ResponseEntity.ok(taskService.updateTask(updateTaskRequest, taskResponse));
+        return ResponseEntity.ok(taskService.updateTask(externalId,updateTaskRequest, taskResponse));
     }
 
-    @PostMapping("/getTaskById")
-    public ResponseEntity<TaskResponse> getTaskById(@RequestBody GetTaskRequest getTaskRequest) {
-        User user = new User.Builder().withId(getTaskRequest.getUserId()).build();
+    @GetMapping("/get/{externalId}/{userId}")
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable UUID externalId,
+                                                    @PathVariable long userId) {
+        User user = new User.Builder().withId(userId).build();
         Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
         if (!result.isPresent()) {
-            logger.info("UserService response: user with id {} not found in database", user.getId());
+            logger.info("User not found in the database: {}", user.getId());
             return ResponseEntity.notFound().build();
         }
 
-        TaskResponse task = taskService.getTask(getTaskRequest.getExternalId(), getTaskRequest.getUserId());
+        TaskResponse task = taskService.getTask(externalId, userId);
 
         if (Objects.isNull(task)) {
             return ResponseEntity.notFound().build();
@@ -77,9 +80,9 @@ public class WebController {
         return ResponseEntity.ok(task);
     }
 
-    @PostMapping("/getTasks")
-    public ResponseEntity<TaskListResponse> getTasks(@RequestBody UserIdRequest userIdRequest) {
-        User user = new User.Builder().withId(userIdRequest.getUserId()).build();
+    @GetMapping("/getTasks/{userId}")
+    public ResponseEntity<TaskListResponse> getTasks(@PathVariable long userId) {
+        User user = new User.Builder().withId(userId).build();
         Optional<User> userResult = Optional.ofNullable(userService.resolveUser(user));
         if (!userResult.isPresent()) {
             logger.info("UserService response: user with id {} not found in database", user.getId());
@@ -87,7 +90,7 @@ public class WebController {
         }
 
         TaskListResponse response = new TaskListResponse();
-        TaskListResponse result = taskService.getTasks(userIdRequest.getUserId(), response);
+        TaskListResponse result = taskService.getTasks(userId, response);
 
         if (result.getTasks().isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -95,14 +98,22 @@ public class WebController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/deleteTaskById") // TODO CLASS
-    public ResponseEntity<Boolean> removeTaskById(@RequestBody int id, long userId) {
+    @DeleteMapping("/delete/{externalId}/{userId}")
+    public ResponseEntity<Boolean> removeTaskById(@PathVariable UUID externalId,
+                                                  @PathVariable long userId) {
         User user = new User.Builder().withId(userId).build();
         Optional<User> userResult = Optional.ofNullable(userService.resolveUser(user));
         if (!userResult.isPresent()) {
             logger.info("UserService response: user with id {} not found in database", user.getId());
             return ResponseEntity.notFound().build();
         }
-        return null;
+        logger.info("Removed task for user {} and externalID: {}", userId,externalId);
+        return ResponseEntity.ok(taskService.removeTask(externalId,userId));
     }
+
+    @GetMapping("/count/{userId}")
+    public long getCompletedTask(){
+        return 1;
+    }
+
 }

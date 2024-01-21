@@ -8,13 +8,16 @@ public class TaskRequest {
     private Instant startTaskTime;
     private Instant endTaskTime;
     private long userId;
+    private StatusTask statusTask;
 
-    private TaskRequest(String name, String description, Instant startTaskTime, Instant endTaskTime, long userId) {
+    public TaskRequest(String name, String description, Instant startTaskTime, Instant endTaskTime, StatusTask statusTask, long userId) {
         this.name = name;
         this.description = description;
         this.startTaskTime = startTaskTime;
         this.endTaskTime = endTaskTime;
+        this.statusTask = statusTask;
         this.userId = userId;
+
     }
 
 
@@ -22,8 +25,9 @@ public class TaskRequest {
                                      String description,
                                      Instant startTaskTime,
                                      Instant endTaskTime,
+                                     StatusTask statusTask,
                                      long userId) {
-        return new TaskRequest(name, description, startTaskTime, endTaskTime, userId);
+        return new TaskRequest(name, description, startTaskTime, endTaskTime, statusTask,userId);
     }
 
     public String getName() {
@@ -64,5 +68,13 @@ public class TaskRequest {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public StatusTask getStatusTask() {
+        return statusTask;
+    }
+
+    public void setStatusTask(StatusTask statusTask) {
+        this.statusTask = statusTask;
     }
 }

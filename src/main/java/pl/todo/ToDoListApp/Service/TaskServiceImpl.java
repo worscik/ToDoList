@@ -24,8 +24,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse getTask(UUID externalId, long userId) {
         Task task = taskDao.getTask(externalId, userId);
-        if (Objects.isNull(task)) {// TODO USER
-            log.info("Task with id {} not found", externalId);
+        if (Objects.isNull(task)) {
+            log.info("Task with id {} not found for user: {}", externalId, userId);
             return new TaskResponse(NOT_FOUND_TASK);
         }
         return new TaskResponse(task);
@@ -60,9 +60,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse updateTask(UpdateTaskRequest request, TaskResponse taskResponse) {
+    public TaskResponse updateTask(UUID externalId, UpdateTaskRequest request, TaskResponse taskResponse) {
         try {
-            return updateTaskInternal(request);
+            return updateTaskInternal(externalId,request);
         } catch (Exception e) {
             log.error("An error occurred while updating the task", e);
             return new TaskResponse(taskResponse.getTask(), "Error occurred during task update.");
@@ -72,15 +72,16 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public boolean removeTask(UUID externalId, long userId) {
         try {
-            return taskDao.deleteTask(externalId, userId);
+            int result = taskDao.deleteTask(externalId, userId);
+            return result > 0;
         } catch (Exception e) {
             log.error("An error occurred while removing the task", e);
             return false;
         }
     }
 
-    private TaskResponse updateTaskInternal(UpdateTaskRequest request) {
-        Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(request.getExternalId(), request.getUserId()));
+    private TaskResponse updateTaskInternal(UUID externalId,UpdateTaskRequest request) {
+        Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(externalId, request.getUserId()));
         try {
             if (optionalTask.isPresent()) {
                 Task task = optionalTask.get();
@@ -90,6 +91,7 @@ public class TaskServiceImpl implements TaskService {
                 task.setDescription(request.getDescription());
                 task.setStartTaskTime(resolveTime(request.getStartTaskTime(), task.getStartTaskTime()));
                 task.setEndTaskTime(resolveTime(request.getEndTaskTime(), task.getEndTaskTime()));
+                task.setStatusTask(request.getStatusTask());
 
                 taskDao.updateTask(task);
                 log.info("Updated task: {}", task);

@@ -11,14 +11,22 @@ public class TaskDto {
     private Instant startTaskTime;
     private Instant endTaskTime;
     private Instant createdOn;
+    private StatusTask statusTask;
 
-    public TaskDto(UUID externalId, String name, String description, Instant startTaskTime, Instant endTaskTime, Instant createdOn) {
+    public TaskDto(UUID externalId,
+                   String name,
+                   String description,
+                   Instant startTaskTime,
+                   Instant endTaskTime,
+                   Instant createdOn,
+                   StatusTask statusTask) {
         this.externalId = externalId;
         this.name = name;
         this.description = description;
         this.startTaskTime = startTaskTime;
         this.endTaskTime = endTaskTime;
         this.createdOn = createdOn;
+        this.statusTask = statusTask;
     }
 
     public UUID getExternalId() {
@@ -67,6 +75,14 @@ public class TaskDto {
 
     public void setCreatedOn(Instant createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public StatusTask getStatusTask() {
+        return statusTask;
+    }
+
+    public void setStatusTask(StatusTask statusTask) {
+        this.statusTask = statusTask;
     }
 }
 

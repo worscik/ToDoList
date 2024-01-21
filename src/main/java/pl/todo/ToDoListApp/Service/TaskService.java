@@ -14,7 +14,7 @@ public interface TaskService {
 
     boolean removeTask(UUID externalId, long userId);
 
-    TaskResponse updateTask(UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse);
+    TaskResponse updateTask(UUID externalId, UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse);
 
     boolean validate(TaskRequest taskRequest);
 

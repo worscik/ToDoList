@@ -24,6 +24,7 @@ public class Task {
     private Instant createdOn;
     private Instant modifyOn;
     private int version;
+    private StatusTask statusTask;
     @JsonIgnore
     private long userId;
 
@@ -39,6 +40,7 @@ public class Task {
         this.createdOn = builder.createdOn;
         this.modifyOn = builder.modifyOn;
         this.version = builder.version;
+        this.statusTask = builder.statusTask;
         this.userId = builder.userId;
     }
 
@@ -122,6 +124,14 @@ public class Task {
         this.userId = userId;
     }
 
+    public StatusTask getStatusTask() {
+        return statusTask;
+    }
+
+    public void setStatusTask(StatusTask statusTask) {
+        this.statusTask = statusTask;
+    }
+
     public static class Builder {
         private UUID uuid;
         private String name;
@@ -131,6 +141,7 @@ public class Task {
         private Instant createdOn;
         private Instant modifyOn;
         private int version;
+        private StatusTask statusTask;
         private long  userId;
 
 
