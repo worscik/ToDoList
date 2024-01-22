@@ -7,11 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.todo.ToDoListApp.Model.*;
 import pl.todo.ToDoListApp.Service.TaskServiceImpl;
-import pl.todo.User.Model.User;
-import pl.todo.User.Model.UserIdRequest;
+import pl.todo.User.Model.UserDto;
 import pl.todo.User.Service.UserServiceImpl;
 
-import java.security.Principal;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,10 +30,10 @@ public class WebController {
 
     @PostMapping("/add")
     public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
-        User user = userService.buildUser(taskRequest.getUserId(), taskRequest.getName());
-        Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
+        UserDto userDto = userService.buildUser(taskRequest.getUserId(), taskRequest.getName());
+        Optional<UserDto> result = Optional.ofNullable(userService.resolveUser(userDto));
         if (!result.isPresent()) {
-            logger.info("UserService response: user with id {} not found in database", user.getId());
+            logger.info("UserService response: user with id {} not found in database", userDto.getId());
             return ResponseEntity.notFound().build();
         }
         TaskResponse taskResponse = new TaskResponse();
@@ -48,10 +46,10 @@ public class WebController {
     @PostMapping("/update/{externalId}")
     public ResponseEntity<TaskResponse> updateTask(@PathVariable UUID externalId,
                                                    @RequestBody UpdateTaskRequest updateTaskRequest) {
-        User user = new User.Builder().withId(updateTaskRequest.getUserId()).build();
-        Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
+        UserDto userDto = new UserDto.Builder().withId(updateTaskRequest.getUserId()).build();
+        Optional<UserDto> result = Optional.ofNullable(userService.resolveUser(userDto));
         if (!result.isPresent()) {
-            logger.info("UserService response: user with id {} not found in database", user.getId());
+            logger.info("UserService response: user with id {} not found in database", userDto.getId());
             return ResponseEntity.notFound().build();
         }
         TaskResponse taskResponse = new TaskResponse();
@@ -65,10 +63,10 @@ public class WebController {
     @GetMapping("/get/{externalId}/{userId}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable UUID externalId,
                                                     @PathVariable long userId) {
-        User user = new User.Builder().withId(userId).build();
-        Optional<User> result = Optional.ofNullable(userService.resolveUser(user));
+        UserDto userDto = new UserDto.Builder().withId(userId).build();
+        Optional<UserDto> result = Optional.ofNullable(userService.resolveUser(userDto));
         if (!result.isPresent()) {
-            logger.info("User not found in the database: {}", user.getId());
+            logger.info("User not found in the database: {}", userDto.getId());
             return ResponseEntity.notFound().build();
         }
 
@@ -82,10 +80,10 @@ public class WebController {
 
     @GetMapping("/getTasks/{userId}")
     public ResponseEntity<TaskListResponse> getTasks(@PathVariable long userId) {
-        User user = new User.Builder().withId(userId).build();
-        Optional<User> userResult = Optional.ofNullable(userService.resolveUser(user));
+        UserDto userDto = new UserDto.Builder().withId(userId).build();
+        Optional<UserDto> userResult = Optional.ofNullable(userService.resolveUser(userDto));
         if (!userResult.isPresent()) {
-            logger.info("UserService response: user with id {} not found in database", user.getId());
+            logger.info("UserService response: user with id {} not found in database", userDto.getId());
             return ResponseEntity.notFound().build();
         }
 
@@ -101,10 +99,10 @@ public class WebController {
     @DeleteMapping("/delete/{externalId}/{userId}")
     public ResponseEntity<Boolean> removeTaskById(@PathVariable UUID externalId,
                                                   @PathVariable long userId) {
-        User user = new User.Builder().withId(userId).build();
-        Optional<User> userResult = Optional.ofNullable(userService.resolveUser(user));
+        UserDto userDto = new UserDto.Builder().withId(userId).build();
+        Optional<UserDto> userResult = Optional.ofNullable(userService.resolveUser(userDto));
         if (!userResult.isPresent()) {
-            logger.info("UserService response: user with id {} not found in database", user.getId());
+            logger.info("UserService response: user with id {} not found in database", userDto.getId());
             return ResponseEntity.notFound().build();
         }
         logger.info("Removed task for user {} and externalID: {}", userId,externalId);

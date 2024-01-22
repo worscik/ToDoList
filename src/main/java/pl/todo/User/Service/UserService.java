@@ -1,9 +1,9 @@
 package pl.todo.User.Service;
 
-import pl.todo.User.Model.User;
+import pl.todo.User.Model.UserDto;
 
 public interface UserService {
 
-    User resolveUser(User user);
+    UserDto findUser(String name);
 
 }
