@@ -70,6 +70,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public int countCompleted(long userId) {
+        return taskDao.countCompletedTasks(userId);
+    }
+
+    @Override
     public boolean removeTask(UUID externalId, long userId) {
         try {
             int result = taskDao.deleteTask(externalId, userId);

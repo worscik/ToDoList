@@ -5,7 +5,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.todo.ToDoListApp.Model.*;
+import pl.todo.ToDoListApp.Model.TaskListResponse;
+import pl.todo.ToDoListApp.Model.TaskRequest;
+import pl.todo.ToDoListApp.Model.TaskResponse;
+import pl.todo.ToDoListApp.Model.UpdateTaskRequest;
 import pl.todo.ToDoListApp.Service.TaskServiceImpl;
 
 import java.util.Objects;
@@ -41,7 +44,7 @@ public class WebController {
                 StringUtils.isBlank(String.valueOf(externalId))) {
             return ResponseEntity.badRequest().body(taskResponse);
         }
-        return ResponseEntity.ok(taskService.updateTask(externalId,updateTaskRequest, taskResponse));
+        return ResponseEntity.ok(taskService.updateTask(externalId, updateTaskRequest, taskResponse));
     }
 
     @GetMapping("/get/{externalId}/{userId}")
@@ -72,13 +75,13 @@ public class WebController {
     public ResponseEntity<Boolean> removeTaskById(@PathVariable UUID externalId,
                                                   @PathVariable long userId) {
 
-        logger.info("Removed task for user {} and externalID: {}", userId,externalId);
-        return ResponseEntity.ok(taskService.removeTask(externalId,userId));
+        logger.info("Removed task for user {} and externalID: {}", userId, externalId);
+        return ResponseEntity.ok(taskService.removeTask(externalId, userId));
     }
 
     @GetMapping("/count/{userId}")
-    public long getCompletedTask(){
-        return 1;
+    public long getCompletedTask(@PathVariable long userId) {
+        return taskService.countCompleted(userId);
     }
 
 }

@@ -16,6 +16,8 @@ public interface TaskService {
 
     TaskResponse updateTask(UUID externalId, UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse);
 
+    int countCompleted(long userId);
+
     boolean validate(TaskRequest taskRequest);
 
     boolean validate(UpdateTaskRequest updateTaskRequest);

@@ -76,4 +76,11 @@ public class TaskDao {
                 .setParameter("userId", userId);
         return result.executeUpdate();
     }
+
+    @Transactional
+    public int countCompletedTasks(long userId){
+        return entityManager.createNativeQuery("SELECT count(id) FROM task where user_id = :userId and status_task = 'COMPLETE'")
+                .setParameter("userId",userId)
+                .getFirstResult();
+    }
 }
