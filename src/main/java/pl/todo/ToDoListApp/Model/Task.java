@@ -185,6 +185,11 @@ public class Task {
             return this;
         }
 
+        public Builder status(StatusTask statusTask){
+            this.statusTask = statusTask;
+            return this;
+        }
+
         public Builder userId(long userId){
             this.userId = userId;
             return this;
@@ -198,13 +203,16 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "id=" + id +
-                ", uuid=" + externalId +
+                " externalId=" + externalId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", startTaskTime=" + startTaskTime +
                 ", endTaskTime=" + endTaskTime +
                 ", createdOn=" + createdOn +
+                ", modifyOn=" + modifyOn +
+                ", version=" + version +
+                ", statusTask=" + statusTask +
+                ", userId=" + userId +
                 '}';
     }
 }

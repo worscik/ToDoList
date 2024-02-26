@@ -10,17 +10,13 @@ public interface TaskService {
 
     TaskListResponse getTasks(long userId, TaskListResponse response);
 
-    TaskResponse insertTask(TaskRequest taskRequest, TaskResponse taskResponse);
+    TaskResponse insertTask(TaskRequest taskRequest);
 
     boolean removeTask(UUID externalId, long userId);
 
     TaskResponse updateTask(UUID externalId, UpdateTaskRequest updateTaskRequest, TaskResponse taskResponse);
 
     int countCompleted(long userId);
-
-    boolean validate(TaskRequest taskRequest);
-
-    boolean validate(UpdateTaskRequest updateTaskRequest);
 
 
 }

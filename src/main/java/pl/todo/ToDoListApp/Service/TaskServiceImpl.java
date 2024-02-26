@@ -42,7 +42,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse insertTask(TaskRequest taskRequest, TaskResponse taskResponse) {
+    public TaskResponse insertTask(TaskRequest taskRequest) {
         Task task = buildTask(taskRequest);
         Optional<Task> isExist = Optional.ofNullable(taskDao.findTask(task.getExternalId(),taskRequest.getUserId()));
         if (isExist.isPresent()) {
@@ -85,7 +85,7 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    private TaskResponse updateTaskInternal(UUID externalId,UpdateTaskRequest request) {
+    private TaskResponse updateTaskInternal(UUID externalId, UpdateTaskRequest request) {
         Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(externalId, request.getUserId()));
         try {
             if (optionalTask.isPresent()) {
@@ -110,31 +110,11 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    @Override
-    public boolean validate(TaskRequest taskRequest) {
-        return validateRequest(taskRequest.getName(), taskRequest.getDescription());
-    }
-
-    @Override
-    public boolean validate(UpdateTaskRequest updateTaskRequest) {
-        return validateRequest(updateTaskRequest.getName(), updateTaskRequest.getDescription());
-    }
-
     private Instant resolveTime(Instant oldTime, Instant newTime) {
         if (oldTime != newTime) {
             return newTime;
         }
         return oldTime;
-    }
-
-    public boolean validateRequest(String name, String description) {
-        if (name.equals("") || name.isBlank() || name.length() > 128) {
-            return false;
-        }
-        if (description.equals("") || description.isEmpty() || description.length() > 1028) {
-            return false;
-        }
-        return true;
     }
 
     private Task buildTask(TaskRequest taskRequest) {
@@ -146,6 +126,7 @@ public class TaskServiceImpl implements TaskService {
                 .endTaskTime(taskRequest.getEndTaskTime())
                 .createdOn(Instant.now())
                 .version(0)
+                .status(taskRequest.getStatusTask())
                 .modifyOn(null)
                 .userId(1)
                 .build();

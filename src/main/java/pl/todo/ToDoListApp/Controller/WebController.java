@@ -14,8 +14,10 @@ import pl.todo.ToDoListApp.Service.TaskServiceImpl;
 import java.util.Objects;
 import java.util.UUID;
 
+import static pl.todo.ToDoListApp.TaskUtils.TaskUtils.validate;
+
 @RestController
-@RequestMapping("/task/api")
+@RequestMapping("/api")
 @CrossOrigin(value = "*")
 public class WebController {
 
@@ -27,31 +29,36 @@ public class WebController {
         this.taskService = taskService;
     }
 
-    @PostMapping("/add")
+    @PostMapping("/task")
     public ResponseEntity<TaskResponse> addTask(@RequestBody TaskRequest taskRequest) {
         TaskResponse taskResponse = new TaskResponse();
-        if (!taskService.validate(taskRequest)) {
+        if (!validate(taskRequest)) {
             return ResponseEntity.badRequest().body(taskResponse);
         }
-        return ResponseEntity.ok(taskService.insertTask(taskRequest, taskResponse));
+        return ResponseEntity.ok(taskService.insertTask(taskRequest));
     }
 
-    @PostMapping("/update/{externalId}")
+    @PostMapping("/task/{externalId}")
     public ResponseEntity<TaskResponse> updateTask(@PathVariable UUID externalId,
                                                    @RequestBody UpdateTaskRequest updateTaskRequest) {
 
         TaskResponse taskResponse = new TaskResponse();
-        if (!taskService.validate(updateTaskRequest) ||
+        if (!validate(updateTaskRequest) ||
                 StringUtils.isBlank(String.valueOf(externalId))) {
             return ResponseEntity.badRequest().body(taskResponse);
         }
         return ResponseEntity.ok(taskService.updateTask(externalId, updateTaskRequest, taskResponse));
     }
 
-    @GetMapping("/get/{externalId}/{userId}")
+    @PutMapping("/task/{externalId}")
+    public ResponseEntity<TaskResponse> updatePartOfTask(@PathVariable UUID externalId,
+                                                         @RequestBody UpdateTaskRequest updateTaskRequest) {
+        return null; //TODO
+    }
+
+    @GetMapping("/task/{externalId}/{userId}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable UUID externalId,
                                                     @PathVariable long userId) {
-
         TaskResponse task = taskService.getTask(externalId, userId);
 
         if (Objects.isNull(task)) {
@@ -60,7 +67,7 @@ public class WebController {
         return ResponseEntity.ok(task);
     }
 
-    @GetMapping("/getTasks/{userId}")
+    @GetMapping("/tasks/{userId}")
     public ResponseEntity<TaskListResponse> getTasks(@PathVariable long userId) {
 
         TaskListResponse response = new TaskListResponse();
@@ -72,7 +79,7 @@ public class WebController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/delete/{externalId}/{userId}")
+    @DeleteMapping("/task/{externalId}/{userId}")
     public ResponseEntity<Boolean> removeTaskById(@PathVariable UUID externalId,
                                                   @PathVariable long userId) {
 
@@ -80,7 +87,7 @@ public class WebController {
         return ResponseEntity.ok(taskService.removeTask(externalId, userId));
     }
 
-    @GetMapping("/count/{userId}")
+    @GetMapping("/countCompleted/{userId}")
     public long getCompletedTask(@PathVariable long userId) {
         return taskService.countCompleted(userId);
     }
