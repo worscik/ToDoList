@@ -3,11 +3,12 @@ package pl.todo.User.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Repository;
 import pl.todo.User.Model.User;
-import pl.todo.User.Model.UserDto;
 
 import java.util.Optional;
 
+@Repository
 public class UserDao {
 
     private final EntityManager entityManager;
@@ -17,21 +18,21 @@ public class UserDao {
     }
 
     @Transactional
-    boolean getUserCredentials(String email, String password) {
+    public boolean findUserByCredentials(String email, String password) {
         try {
             User result = (User) entityManager.createNativeQuery("SELECT * FROM application_user WHERE " +
-                    "email = :email AND password = :password", User.class)
+                            "email = :email AND password = :password", User.class)
                     .setParameter("email", email)
                     .setParameter("password", password)
                     .getSingleResult();
             return true;
-        } catch (NoResultException e){
+        } catch (NoResultException e) {
             return false;
         }
     }
 
     @Transactional
-    Optional<User> findUserByExternalId(String externalId) {
+    public Optional<User> findUserByExternalId(String externalId) {
         try {
             User result = (User) entityManager.createNativeQuery(
                             "SELECT * FROM application_user WHERE externalId = :externalId", User.class)
@@ -44,23 +45,30 @@ public class UserDao {
     }
 
     @Transactional
-    void addUser(User user) {
-       try {
-           entityManager.persist(user);
-       } catch (Exception e){
-           System.out.println(e);
-       }
+    public User findUserByEmail(String email) {
+        try {
+            User result = (User) entityManager.createNativeQuery(
+                            "SELECT * FROM application_user WHERE email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+            return result;
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
-    UserDto editUser(UserDto userDto) {
-        return null;
+    @Transactional
+    public void add(User user) {
+        entityManager.persist(user);
     }
 
-    boolean removeUser(UserDto userDto) {
-        return true;
+    @Transactional
+    public User edit(User user) {
+        return entityManager.merge(user);
     }
 
-    String newPassword(UserDto userDto) {
-        return null;
+    @Transactional
+    public void delete(User user) {
+        entityManager.remove(user);
     }
 }

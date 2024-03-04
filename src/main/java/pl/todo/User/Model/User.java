@@ -9,7 +9,6 @@ import java.util.UUID;
 @Table(name = "application_user")
 public class User {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
@@ -17,13 +16,20 @@ public class User {
     private UUID externalId;
     private String email;
     private String password;
-    private String role;
+    private UserRole userRole;
 
-    private User(UUID externalId, String email, String password, String role) {
+    public User() {
     }
 
-    public static User createUser(UUID externalId, String email, String password, String role) {
-        return new User(externalId, email, password, role);
+    private User(UUID externalId, String email, String password, UserRole userRole) {
+        this.externalId = externalId;
+        this.email = email;
+        this.password = password;
+        this.userRole = userRole;
+    }
+
+    public static User createUser(UUID externalId, String email, String password, UserRole userRole) {
+        return new User(externalId, email, password, userRole);
     }
 
     public Long getId() {
@@ -50,12 +56,12 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public UserRole getUserRole() {
+        return userRole;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 
     public UUID getExternalId() {

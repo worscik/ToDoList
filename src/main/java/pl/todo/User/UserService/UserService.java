@@ -2,14 +2,14 @@ package pl.todo.User.UserService;
 
 import pl.todo.User.Model.User;
 import pl.todo.User.Model.UserDto;
+import pl.todo.User.Model.UserResponse;
 
 public interface UserService {
 
-    boolean checkUserCredentials();
+    boolean resolveUser(String password, String login);
     User findUser(String externalId);
-    UserDto addUser(UserDto userDto);
-    UserDto editUser(UserDto userDto);
+    UserResponse addUser(String login, String password);
+    UserResponse editUser(UserDto userDto);
     boolean removeUser(UserDto userDto);
-    String newPassword(UserDto userDto);
 
 }
