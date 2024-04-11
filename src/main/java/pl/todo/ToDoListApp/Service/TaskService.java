@@ -1,6 +1,9 @@
 package pl.todo.ToDoListApp.Service;
 
-import pl.todo.ToDoListApp.Model.*;
+import pl.todo.ToDoListApp.Model.TaskListResponse;
+import pl.todo.ToDoListApp.Model.TaskRequest;
+import pl.todo.ToDoListApp.Model.TaskResponse;
+import pl.todo.ToDoListApp.Model.UpdateTaskRequest;
 
 import java.util.UUID;
 

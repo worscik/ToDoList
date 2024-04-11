@@ -53,7 +53,12 @@ public class WebController {
     @PutMapping("/task/{externalId}")
     public ResponseEntity<TaskResponse> updatePartOfTask(@PathVariable UUID externalId,
                                                          @RequestBody UpdateTaskRequest updateTaskRequest) {
-        return null; //TODO
+        TaskResponse taskResponse = new TaskResponse();
+        if (!validate(updateTaskRequest) ||
+                StringUtils.isBlank(String.valueOf(externalId))) {
+            return ResponseEntity.badRequest().body(taskResponse);
+        }
+        return ResponseEntity.ok(taskService.updateTaskByElements(externalId, updateTaskRequest, taskResponse));
     }
 
     @GetMapping("/task/{externalId}/{userId}")

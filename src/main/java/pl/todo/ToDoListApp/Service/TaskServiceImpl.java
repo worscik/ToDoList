@@ -35,7 +35,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskListResponse getTasks(long userId, TaskListResponse response) {
         List<Task> listTasks = taskDao.getTasks(userId);
         if (listTasks.isEmpty()) {
-            log.info("Tasks not found for user {}",userId );
+            log.info("Tasks not found for user {}", userId);
             return new TaskListResponse(Collections.emptyList(), NOT_FOUND_TASK);
         }
         return new TaskListResponse(listTasks);
@@ -44,25 +44,20 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse insertTask(TaskRequest taskRequest) {
         Task task = buildTask(taskRequest);
-        Optional<Task> isExist = Optional.ofNullable(taskDao.findTask(task.getExternalId(),taskRequest.getUserId()));
-        if (isExist.isPresent()) {
-            log.info("Task {0} not found", isExist.get().getId());
-            return new TaskResponse(task, NOT_FOUND_TASK);
-        }
         try {
             taskDao.addTask(task);
             log.info("Added task: " + task);
             return new TaskResponse(task);
         } catch (Exception e) {
             log.error("An error occurred when try to add task" + e);
-            return new TaskResponse(task, "Error.");
+            return new TaskResponse(task, "");
         }
     }
 
     @Override
     public TaskResponse updateTask(UUID externalId, UpdateTaskRequest request, TaskResponse taskResponse) {
         try {
-            return updateTaskInternal(externalId,request);
+            return updateTaskInternal(externalId, request);
         } catch (Exception e) {
             log.error("An error occurred while updating the task", e);
             return new TaskResponse(taskResponse.getTask(), "Error occurred during task update.");
@@ -106,6 +101,31 @@ public class TaskServiceImpl implements TaskService {
             }
         } catch (Exception e) {
             log.error("Error during update task: {0}, errorCode: {1}", optionalTask.get().getId(), e);
+            return new TaskResponse(null, "Error during update task");
+        }
+    }
+
+    public TaskResponse updateTaskByElements(UUID externalId, UpdateTaskRequest request, TaskResponse taskResponse) {
+        Optional<Task> optionalTask = Optional.ofNullable(taskDao.findTask(externalId, request.getUserId()));
+        try {
+            if (optionalTask.isPresent()) {
+                Task task = optionalTask.get();
+                task.setName(request.getName());
+                task.setVersion(task.getVersion() + NEW_VERSION);
+                task.setModifyOn(Instant.now());
+                task.setDescription(request.getDescription());
+                task.setStartTaskTime(resolveTime(request.getStartTaskTime(), task.getStartTaskTime()));
+                task.setEndTaskTime(resolveTime(request.getEndTaskTime(), task.getEndTaskTime()));
+                task.setStatusTask(request.getStatusTask());
+
+                taskDao.updateTask(task);
+                log.info("Updated task: {}", task);
+                return new TaskResponse(task);
+            } else {
+                return new TaskResponse(null, "Task not found.");
+            }
+        } catch (Exception e) {
+            log.error("Error during update task: {}", optionalTask.get(), e);
             return new TaskResponse(null, "Error during update task");
         }
     }
